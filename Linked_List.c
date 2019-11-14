@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <check_parenthese.h>
+#include <eval.h>
+#include <infix2postfix.h>
+
 
 typedef int element;
 typedef struct position{
