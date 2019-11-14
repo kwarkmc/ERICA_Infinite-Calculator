@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <check_parenthese.h>
-#include <eval.h>
-#include <infix2postfix.h>
+#include "Linked_stack.h"
+#include "check_parenthese.h"
+#include "eval.h"
+#include "infix2postfix.h"
+
+#define FALSE 0
+#define TRUE 1
 
 
 typedef int element;
