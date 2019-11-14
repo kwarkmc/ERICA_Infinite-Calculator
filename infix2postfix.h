@@ -1,0 +1,34 @@
+void infix_to_postfix(char exp[]) {
+  int i = 0;
+  char ch, top_op;
+  int len = strlen(exp);
+  StackType s;
+
+  init(&s);
+  for (i = 0;i < len;i++) {
+    ch = exp[i]; 
+    // 입력된 값이 연산자이면
+    switch(ch) {
+      case'+':case'-':case'*':case'/':
+        while(!is_empty(&s) && prec(ch) <= prec(peek(&s)))
+          printf("%c", pop(&s));
+        push(&s, ch);
+        break;
+      case'(':
+        push(&s, ch);
+        break;
+      case')':
+        top_op = pop(&s);
+        while(top_op != '(') {
+          printf("%c", top_op);
+          top_op = pop(&s);
+        }
+        break;
+      default:
+        printf("%c", ch);
+        break;
+    }
+  }
+  while(!is_empty(&s))
+    printf("%c", pop(&s));
+}
