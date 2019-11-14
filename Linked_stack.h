@@ -8,7 +8,7 @@ typedef struct {
 }StackType;
 
 void init(StackType *s) {
-  stack->top = NULL;
+  s->top = NULL;
 }
 
 int is_empty(StackType *s) {
@@ -18,8 +18,8 @@ int is_empty(StackType *s) {
 void push(StackType *s, int data) {
   Node *now = (Node *)malloc(sizeof(Node));
   now->data = data;
-  now->next = stack->top;
-  stack->top = now;
+  now->next = s->top;
+  s->top = now;
 }
 
 int pop(StackType *s) {
@@ -31,7 +31,7 @@ int pop(StackType *s) {
   now = s->top;
   re = now->data;
 
-  stack->top = now->next;
+  s->top = now->next;
   free(now);
   return re;
 }

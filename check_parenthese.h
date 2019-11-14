@@ -1,3 +1,6 @@
+#define TRUE 1
+#define FALSE 0
+
 int check_parenthese(char *in) {
   StackType s;
   char ch, open_ch;
@@ -12,17 +15,17 @@ int check_parenthese(char *in) {
         break;
       case')':case'}':case']':
         if(is_empty(&s))
-          return false;
+          return FALSE;
         else {
           open_ch = pop(&s);
           if((open_ch == '(' && ch != ')') || (open_ch == '[' && ch != ']') || (open_ch == '{' && ch != '}'))
-            return false;
+            return FALSE;
           break;
         }
         
     }
   }
   if(!is_empty(&s))
-    return false;
-  return true;
+    return FALSE;
+  return TRUE;
 }
