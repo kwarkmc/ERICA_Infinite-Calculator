@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Stack.h"
+
 /*
 	getNode 함수 생성
 	doubly로의 변경
@@ -47,6 +49,7 @@ node_info* getNode(node_info *target,char index_char){
 }
 
 int main(int argc,char* argv[]){
+	StackType s; // Stack 선언
 	char data;
 	FILE *fp=fopen(argv[1],"r");// argv[1]에는 input이 있다.
 	if(fp==NULL)
