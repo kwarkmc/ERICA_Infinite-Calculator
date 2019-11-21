@@ -48,6 +48,37 @@ node_info* getNode(node_info *target,char index_char){
 	return target;
 }
 
+int prec(char op) {
+	swtich(op) {
+		case'(':case')':
+		return 0;
+		case'+':case'-':
+		return 1;
+		case'*':
+		return 2;
+	}
+	return -1;
+}
+
+void infix_to_postfix(char exp[]) {
+	int i = 0;
+	char ch, top_op;
+	int len = strlen(exp);
+	StackType s;
+
+	init(&s);
+
+	for(i=0;i<len;i++) {
+		ch = exp[i];
+
+		switch(ch) {
+			case'+':case'-':case'*':
+			while (!is_empty(&s) && (prec(ch)) <= prec(peek(&s)))
+				pop(&s); // pop값을 어디로 반환?
+		}
+	}
+}
+
 int main(int argc,char* argv[]){
 	StackType s; // Stack 선언
 	char data;
@@ -70,6 +101,7 @@ int main(int argc,char* argv[]){
 		/*
 		   지금 이 부분에 printf하는 부분을 빼고 후위 표기법에 대한 함수를 넣으면 될 것이다.
 		   새로운 linked list를 만들어서 다시 insert해야한다.
+		   1)공백이 나올 때 까지 
 		   */
 		curr = curr->next_pointer;
 	}//curr에 있는 data 소환하는 부분

@@ -1,5 +1,6 @@
 #define MAX_STACK_SIZE 100
 
+
 typedef struct {
     int top;
     int stack[MAX_STACK_SIZE];
@@ -31,6 +32,7 @@ void push(StackType *s, int item) {
 int pop (StackType *s) {
     if(is_empty(s)) {
         printf("Stack Empty Error\n");
+        exit(1);
     }
     else {
         return s->stack[(s->top)--];
@@ -40,6 +42,7 @@ int pop (StackType *s) {
 int peek (StackType *s) {
     if(is_empty(s)) {
         printf("Stack Empty Error\n");
+        exit(1);
     }
     else
     {
