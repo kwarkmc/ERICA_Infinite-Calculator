@@ -88,6 +88,51 @@ void Display(node_info *node){
 		node=node->next_pointer;
 	}
 }
+
+int prec(char op) {
+		switch (test->prev_pointer) {
+			case'(':case')': return 0;
+			case'+':case'-': return 1;
+			case'*': return 2;
+		}
+		return -1;
+	}
+
+	/*연산자의 우선순위를 반환.*/
+
+	void infix_to_postfix(char exp[]) {
+		int i = 0;
+		char top_op;
+		Stack s;
+
+		init(&s);
+
+		switch(exp) { // !issue, 포인터 관련 표현 질문
+			case'+':case'-':case'*':
+				while(!is_empty(&s) && (prec(exp) <= prec(peek(&s)))) {
+					//스택에 있는 연산자의 우선순위가 더 크거나 같으면 출력 -> 출력방법
+					push(&s, ch);
+					break;
+				}
+					
+			case'(':
+				push(&s, ch);
+				break;
+			case')':
+				top_op = pop(&s);
+				while (top_op != '(') {
+					//왼쪽 괄호를 만날 때 까지 출력
+					top_op = pop(&s);
+				}
+				break;
+			default:
+				//피연산자를 만나면 출력
+				break;
+		}
+		
+
+	}
+
 int main(int argc,char* argv[]){
 	char data;
     Stack stack; // Linked-List stack 설정
@@ -97,6 +142,14 @@ int main(int argc,char* argv[]){
 	pointer *L = (pointer *)malloc(sizeof(pointer));
 	L->head = NULL;
 	L->tail = NULL;
+
+	//받아온 파일의 Linked-List
+
+	pointer *L_Stack = (pointer *)malloc(sizeof(pointer));
+	L_Stack->head = NULL;
+	L_Stack->tail = NULL;
+
+	//Postfix 처리를 끝낸 식을 넣는 Linked-List.
 	
 	while(fscanf(fp,"%c",&data)!=EOF){
 		if((data >= '1' && data <= '9')|| data == '.'|| data == '+' || data == '-' || data == ' ' || data == ')'|| data == '('){
@@ -115,7 +168,7 @@ int main(int argc,char* argv[]){
 	test = getNode(curr,' ');
 	/* 이것을 이용해서 스페이스 바를 기준으로 나눌 수 있다.*/
 	printf("\n");
-	
+
 	//예제 1
 	curr = L->head;
 	while(curr != NULL || curr != test){
