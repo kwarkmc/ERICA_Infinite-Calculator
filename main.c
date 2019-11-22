@@ -48,9 +48,10 @@ void Push(Stack *stack, int data) {
 int Pop(Stack *stack) {
     Node *now;
     int re;
+
     if(is_empty(stack)) {
-        fprintf(stderr, "Stack Empty");
-        return 0;
+        fprintf(stderr, "Stack Empty\n");
+        exit(1);
     }
     now = stack->top;
     re = now->data;
@@ -58,6 +59,17 @@ int Pop(Stack *stack) {
     stack->top = now->next;
     free(now);
     return re;
+}
+
+int Peek(Stack *stack) {
+	if(is_empty(stack)) {
+		fprintf(stderr, "Stack Empty\n");
+		exit(1);
+	}
+	
+	return stack->top->data;
+
+
 }
 
 //Stack 함수 끝
@@ -100,34 +112,39 @@ int prec(char op) {
 
 	/*연산자의 우선순위를 반환.*/
 
-	void infix_to_postfix(char exp[]) {
+	void infix_to_postfix(node_info *test) {
 		int i = 0;
 		char top_op;
+
 		Stack s;
+		init_stack(&s);
 
-		init(&s);
+		//Linked-List Stack 설정
 
-		switch(exp) { // !issue, 포인터 관련 표현 질문
+		switch(*(test->prev_pointer)) { // !issue, 포인터 관련 표현 질문
 			case'+':case'-':case'*':
-				while(!is_empty(&s) && (prec(exp) <= prec(peek(&s)))) {
+				while(!is_empty(&s) && (prec(test->prev_pointer) <= prec(peek(&s)))) {
 					//스택에 있는 연산자의 우선순위가 더 크거나 같으면 출력 -> 출력방법
-					push(&s, ch);
+					Push(&s, test->prev_pointer);
 					break;
 				}
-					
 			case'(':
-				push(&s, ch);
+				Push(&s, test->prev_pointer);
 				break;
 			case')':
-				top_op = pop(&s);
+				top_op = Pop(&s);
 				while (top_op != '(') {
 					//왼쪽 괄호를 만날 때 까지 출력
-					top_op = pop(&s);
+					top_op = Pop(&s);
 				}
 				break;
 			default:
 				//피연산자를 만나면 출력
 				break;
+		}
+
+		while (!is_empty(&s)) {
+			//스택에 있는 연산자들 출력. pop
 		}
 		
 
@@ -135,8 +152,6 @@ int prec(char op) {
 
 int main(int argc,char* argv[]){
 	char data;
-    Stack stack; // Linked-List stack 설정
-	init_stack(&stack);
 
 	FILE *fp=fopen(argv[1],"r");
 	pointer *L = (pointer *)malloc(sizeof(pointer));
