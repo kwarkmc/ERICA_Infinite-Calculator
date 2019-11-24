@@ -142,12 +142,9 @@ int prec(char op) {
 				//피연산자를 만나면 출력
 				break;
 		}
-
 		while (!is_empty(&s)) {
 			//스택에 있는 연산자들 출력. pop
 		}
-		
-
 	}
 
 int main(int argc,char* argv[]){
