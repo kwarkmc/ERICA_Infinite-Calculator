@@ -22,18 +22,69 @@ typedef struct node_info{
 	element data; 
 	struct node_info* next_pointer;
 	struct node_info* prev_pointer;
-}node_info;
+} node_info;
+
+//Stack 구현
+
+typedef struct Node {
+    int data;
+    struct Node *next;
+} Node;
+
+typedef struct Stack {
+    Node *top;
+} Stack;
+
+void init_stack(Stack *stack) {
+    stack->top = NULL;
+}
+
+int is_empty(Stack *stack) {
+    return (stack->top == NULL);
+}
+
+void Push(Stack *stack, int data) {
+    Node *now = (Node *)malloc(sizeof(Node));
+    now->data = data;
+    now->next = stack->top;
+    stack->top = now;
+}
+
+int Pop(Stack *stack) {
+    Node *now;
+    int re;
+
+    if(is_empty(stack)) {
+        fprintf(stderr, "Stack Empty\n");
+        exit(1);
+    }
+
+    now = stack->top;
+    re = now->data;
+
+    stack->top = now->next;
+    free(now);
+    return re;
+}
+
+int Peek(Stack *stack) {
+    if(is_empty(stack)) {
+        fprintf(stderr, "Stack Full\n");
+        exit(1);
+    }
+    return stack->top->data;
+}
 
 bool flag = 0;
 
-void insert_node(pointer *target,int data){
+void insert_node(pointer *target,int data) {
 	node_info *new_node = malloc(sizeof(node_info));
 	new_node -> next_pointer = NULL;
 	new_node -> prev_pointer = NULL;
 	new_node -> data = data;
-	if(target->head == NULL)
+	if (target->head == NULL)
 		target->head = target->tail = new_node;
-	else{
+	else {
 		target->tail-> next_pointer = new_node;
 		new_node->prev_pointer = target->tail;
 		target->tail = new_node; 
@@ -53,7 +104,7 @@ node_info* getNode(node_info *target,char index_char){
 	return target;
 }
 
-void Display(node_info *node){
+void Display(node_info *node) {
 	while(node != NULL){
 		if(node->data >= 0 && node->data <= 9)
 			printf("%d",node->data); 
@@ -67,7 +118,7 @@ void Display(node_info *node){
 	}
 }
 
-void setNode(node_info *target){
+void setNode(node_info *target) {
 	if(target->data >= 0 && target->data <= 9){
 		node_info *new_node = malloc(sizeof(node_info));
 		new_node -> data = 'P';
@@ -85,8 +136,8 @@ void setNode(node_info *target){
 	/*
 	   처음 시작했을 경우에 +인 경우를 위한 처리
 	   */
-	while(target !=NULL){
-		if(target->data == '+'){
+	while(target !=NULL) {
+		if(target->data == '+') {
 			if(target->next_pointer->next_pointer->data >=0 && target->next_pointer->next_pointer->data <=9){
 				target = target->next_pointer;
 				node_info *new_node = malloc(sizeof(node_info));
@@ -103,7 +154,7 @@ void setNode(node_info *target){
 			}
 		}
 		
-		if(target->data == '-'){
+		if(target->data == '-') {
 			if(target->prev_pointer->prev_pointer->data < 0 || target->prev_pointer->prev_pointer->data > 9){
 				target->data = 'N';
 				target -> next_pointer = target->next_pointer->next_pointer;
@@ -114,7 +165,7 @@ void setNode(node_info *target){
 	}
 }
 
-node_info *setCurr(pointer *target){
+node_info *setCurr(pointer *target) {
 	node_info *curr = malloc(sizeof(node_info));
 	if(flag == 1)
 		curr = target->head->prev_pointer;
@@ -123,21 +174,23 @@ node_info *setCurr(pointer *target){
 	return curr;
 }
 
-int main(int argc,char* argv[]){
+
+
+int main(int argc,char* argv[]) {
 	char data;
 	FILE *fp=fopen(argv[1],"r");
 	pointer *L = (pointer *)malloc(sizeof(pointer));
 	L->head = NULL;
 	L->tail = NULL;
 	
-	while(fscanf(fp,"%c",&data)!=EOF){
-		if(data >= '0' && data <= '9'){
+	while(fscanf(fp,"%c",&data)!=EOF) {
+		if(data >= '0' && data <= '9') {
 			/*
 			   숫자 - int로의 형변환
 			   */
 			insert_node(L,atoi(&data));
 		}
-		else if(data == '.'|| data == '+' || data == '-' || data == ' ' || data == ')'|| data == '('){
+		else if(data == '.'|| data == '+' || data == '-' || data == ' ' || data == ')'|| data == '(') {
 			/*
 			   char - 그대로 유지
    				*/

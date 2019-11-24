@@ -66,10 +66,7 @@ int Peek(Stack *stack) {
 		fprintf(stderr, "Stack Empty\n");
 		exit(1);
 	}
-	
 	return stack->top->data;
-
-
 }
 
 //Stack 함수 끝
