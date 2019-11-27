@@ -1,11 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 /*
-   (,) 예외처리 추가
-   Display 구현
-   strtok(?)을 이용하는 방법 예제 추가
-*/
+   getNode 변경에 대한 주석
+   형변환으로 인해 신경 써야하는 부분 주석
+   피연산자와 연산자 간의 간격에 대한 논의(조교님한테 여쭤봐야함)
+   형변환하는 부분
+   형변환으로 인해 바뀐것에 대한 예시
+   '-'일 경우와 '+'일 경우
+   첫 시작이 '+'일 경]
+	*/
 
 typedef char element;
 typedef struct pointer{
@@ -18,59 +23,7 @@ typedef struct node_info{
 	struct node_info* next_pointer;
 	struct node_info* prev_pointer;
 }node_info;
-
-//Stack 함수 시작
-
-typedef struct Node{
-    int data;
-    struct Node *next;
-} Node;
-
-typedef struct Stack {
-    Node *top;
-} Stack;
-
-void init_stack(Stack *stack) {
-    stack->top = NULL; // top을 NULL 로 설정
-}
-
-int is_empty(Stack *stack) {
-    return (stack->top == NULL);
-}
-
-void Push(Stack *stack, int data) {
-    Node *now = (Node *)malloc(sizeof(Node));
-    now->data = data;
-    now->next = stack->top;
-    stack->top = now;
-}
-
-int Pop(Stack *stack) {
-    Node *now;
-    int re;
-
-    if(is_empty(stack)) {
-        fprintf(stderr, "Stack Empty\n");
-        exit(1);
-    }
-    now = stack->top;
-    re = now->data;
-
-    stack->top = now->next;
-    free(now);
-    return re;
-}
-
-int Peek(Stack *stack) {
-	if(is_empty(stack)) {
-		fprintf(stderr, "Stack Empty\n");
-		exit(1);
-	}
-	return stack->top->data;
-}
-
-//Stack 함수 끝
-
+bool flag = 0;
 void insert_node(pointer *target,int data){
 	node_info *new_node = malloc(sizeof(node_info));
 	new_node -> next_pointer = NULL;
@@ -85,83 +38,103 @@ void insert_node(pointer *target,int data){
 	}
 }
 node_info* getNode(node_info *target,char index_char){
+	/*
+	   getNode를 하는 경우는 숫자가 아닌 문자를 찾는다.
+	   만약에 숫자를 찾게 되는 경우 아무런 숫자가 안뜰것이다.
+	   */
 	while(target != NULL){
-		if(index_char == target->data) break;
+		if(index_char == target->data) 
+			break;
 		target = target->next_pointer;
 	}
 	return target;
 }
 void Display(node_info *node){
 	while(node != NULL){
-		printf("%c",node->data);
+		if(node->data >= 0 && node->data <= 9)
+			printf("%d",node->data); 
+		else
+			printf("%c",node->data);
+		/*
+		   숫자의 경우 int형, 문자의 경우 char형으로 입력이 되었기 때문에, 이 두가지를 구별 해야한다.
+		   예시 - 131번째줄
+		   */
 		node=node->next_pointer;
 	}
 }
 
-int prec(char op) {
-		switch (test->prev_pointer) {
-			case'(':case')': return 0;
-			case'+':case'-': return 1;
-			case'*': return 2;
-		}
-		return -1;
+void setNode(node_info *target){
+	if(target->data >= 0 && target->data <= 9){
+		node_info *new_node = malloc(sizeof(node_info));
+		new_node -> data = 'P';
+		new_node -> next_pointer = target;
+		new_node -> prev_pointer = target->prev_pointer;
+		target -> prev_pointer = new_node;
+		target = target->next_pointer;
+		flag =1;
+	}else if(target->data == '-'){
+		target->data = 'N';
+		target->next_pointer = target->next_pointer->next_pointer;
+		target = target->next_pointer;
 	}
-
-	/*연산자의 우선순위를 반환.*/
-
-	void infix_to_postfix(node_info *test) {
-		int i = 0;
-		char top_op;
-
-		Stack s;
-		init_stack(&s);
-
-		//Linked-List Stack 설정
-
-		switch(*(test->prev_pointer)) { // !issue, 포인터 관련 표현 질문
-			case'+':case'-':case'*':
-				while(!is_empty(&s) && (prec(test->prev_pointer) <= prec(peek(&s)))) {
-					//스택에 있는 연산자의 우선순위가 더 크거나 같으면 출력 -> 출력방법
-					Push(&s, test->prev_pointer);
-					break;
-				}
-			case'(':
-				Push(&s, test->prev_pointer);
-				break;
-			case')':
-				top_op = Pop(&s);
-				while (top_op != '(') {
-					//왼쪽 괄호를 만날 때 까지 출력
-					top_op = Pop(&s);
-				}
-				break;
-			default:
-				//피연산자를 만나면 출력
-				break;
+	
+	/*
+	   처음 시작했을 경우에 +인 경우를 위한 처리
+	   */
+	while(target !=NULL){
+		if(target->data == '+'){
+			if(target->next_pointer->next_pointer->data >=0 && target->next_pointer->next_pointer->data <=9){
+				target = target->next_pointer;
+				node_info *new_node = malloc(sizeof(node_info));
+				/*
+				   연산자 및 피연산자 사이는 무조건 스페이스바로 되어있나?
+				   예시2) 123 + 540 - ( 342)	||	123 + 540 - (354)
+				   */
+				new_node -> data = 'P';
+				new_node -> next_pointer = target->next_pointer;
+				new_node -> prev_pointer = target;
+				target -> next_pointer -> prev_pointer = new_node;
+				target -> next_pointer = new_node;
+			}
 		}
-		while (!is_empty(&s)) {
-			//스택에 있는 연산자들 출력. pop
+		
+		if(target->data == '-'){
+			if(target->prev_pointer->prev_pointer->data < 0 || target->prev_pointer->prev_pointer->data > 9){
+				target->data = 'N';
+				target -> next_pointer = target->next_pointer->next_pointer;
+			}
 		}
+		
+		target = target->next_pointer;
 	}
+}
+node_info *setCurr(pointer *target){
+	node_info *curr = malloc(sizeof(node_info));
+	if(flag == 1)
+		curr = target->head->prev_pointer;
+	else
+		curr = target->head;
+	return curr;
+}
 
 int main(int argc,char* argv[]){
 	char data;
-
 	FILE *fp=fopen(argv[1],"r");
 	pointer *L = (pointer *)malloc(sizeof(pointer));
 	L->head = NULL;
 	L->tail = NULL;
-
-	//받아온 파일의 Linked-List
-
-	pointer *L_Stack = (pointer *)malloc(sizeof(pointer));
-	L_Stack->head = NULL;
-	L_Stack->tail = NULL;
-
-	//Postfix 처리를 끝낸 식을 넣는 Linked-List.
 	
 	while(fscanf(fp,"%c",&data)!=EOF){
-		if((data >= '1' && data <= '9')|| data == '.'|| data == '+' || data == '-' || data == ' ' || data == ')'|| data == '('){
+		if(data >= '0' && data <= '9'){
+			/*
+			   숫자 - int로의 형변환
+			   */
+			insert_node(L,atoi(&data));
+		}
+		else if(data == '.'|| data == '+' || data == '-' || data == ' ' || data == ')'|| data == '('){
+			/*
+			   char - 그대로 유지
+   				*/
 			insert_node(L,data);
 		}
 		else continue; // 잘못된 입력 예외처리
@@ -169,26 +142,28 @@ int main(int argc,char* argv[]){
 	fclose(fp);
 	
 	node_info *curr = L->head; 
+	setNode(curr);
+	curr =setCurr(L);
 	Display(curr);
-	/* Display 구현*/
-
-	curr = L->head;
+	curr = setCurr(L);
 	node_info *test= getNode(curr,' ');
 	test = getNode(curr,' ');
-	/* 이것을 이용해서 스페이스 바를 기준으로 나눌 수 있다.*/
 	printf("\n");
-
+	
 	//예제 1
-	curr = L->head;
+	
+	curr =setCurr(L);
 	while(curr != NULL || curr != test){
 		if(curr == test) {
-			printf("\n같은 지점\n");
 			break;
 		}
-
-		printf("%c",curr->data);
+		if(curr->data>=0 && curr->data <= 9) 
+			printf("%d",curr->data);
+		else
+			printf("%c",curr->data);
 		curr = curr ->next_pointer;
 	}
+	
 	/*
 	//예제 2
 	while(test != NULL){
@@ -196,11 +171,7 @@ int main(int argc,char* argv[]){
 		test = test-> next_pointer;
 	}
 	*/
-	/*
-	   위와 같이 pointer를 나눌 수 있다.
-	   이거를 이용해야 할 듯 하다.
-	   */
-	curr = L->head;
+	curr = setCurr(L);
 	while(curr != NULL){
 		node_info *next = curr->next_pointer;
 		free(curr);

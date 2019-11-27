@@ -174,14 +174,59 @@ node_info *setCurr(pointer *target) {
 	return curr;
 }
 
+//연산자의 우선순위 반환 함수 prec
+int prec(char op) {
+	switch(op) {
+		case'(':case')': return 0;
+		case'+':case'-': return 1;
+		case'*': return 2;
+	}
+	return -1;
+}
 
+void infix_to_postfix(node_info *curr, node_info *curr_3) {
+
+	int i = 0;
+	char top_op;
+
+	Stack s;
+	init_stack(&s);
+
+	switch(curr->data) {
+		case'+':case'-':case'*':
+			Push(&s, curr->data);
+			break;
+		case'(':
+			Push(&s, curr->data);
+			break;
+		case')': //왼쪽 괄호를 만날 때 까지 출력.
+			top_op = Pop(&s);
+			while(top_op != '(') {
+				top_op = Pop(&s);
+			}
+			break;
+		default: // 피연산자를 만나면 출력
+			curr_3->data = Pop(&s);
+			break;
+	}
+	while (!is_empty(&s)) {
+		curr_3->data = Pop(&s); //마지막에 스택에 있는 연산자들 출력.
+	}
+}
 
 int main(int argc,char* argv[]) {
 	char data;
 	FILE *fp=fopen(argv[1],"r");
+
 	pointer *L = (pointer *)malloc(sizeof(pointer));
 	L->head = NULL;
 	L->tail = NULL;
+
+	//postfix 처리를 끝낸 식을 저장하는 L3
+
+	pointer *L3 = (pointer *)malloc(sizeof(pointer));
+	L3->head = NULL;
+	L3->tail = NULL;
 	
 	while(fscanf(fp,"%c",&data)!=EOF) {
 		if(data >= '0' && data <= '9') {
@@ -208,8 +253,19 @@ int main(int argc,char* argv[]) {
 	node_info *test= getNode(curr,' ');
 	test = getNode(curr,' ');
 	printf("\n");
+
+	//postfix 완료된 List -> L3
+
+	node_info *curr_3 = L3->head;
+	setNode(curr_3);
+	curr_3 = setCurr(L3);
+
+	infix_to_postfix(curr, curr_3);
+
+	Display(curr_3);
 	
 	//예제 1
+	/*
 	curr =setCurr(L);
 	while(curr != NULL || curr != test){
 		if(curr == test) {
@@ -221,6 +277,7 @@ int main(int argc,char* argv[]) {
 			printf("%c",curr->data);
 		curr = curr ->next_pointer;
 	}
+	*/
 	/*
 	//예제 2
 	while(test != NULL){
@@ -234,7 +291,10 @@ int main(int argc,char* argv[]) {
 		free(curr);
 		curr = next;
 	}//초기화하는 부분
+
 	free(L);
+
+	free(L3);
 	
 	return 0;
 
