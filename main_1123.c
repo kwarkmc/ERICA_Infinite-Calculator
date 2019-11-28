@@ -192,7 +192,7 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 	Stack s;
 	init_stack(&s);
 
-	while(curr->next_pointer == NULL) {
+	while(curr != NULL) {
 
 		switch(curr->data) {
 			case'+':case'-':case'*':
@@ -266,9 +266,8 @@ int main(int argc,char* argv[]) {
 
 	node_info *curr_3 = L3->head;
 	curr_3 = setCurr(L3);
-
 	infix_to_postfix(L3, curr, curr_3);
-
+	curr_3 = setCurr(L3);
 	Display(curr_3);
 	
 	//예제 1

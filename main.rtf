@@ -3,8 +3,13 @@
 #include <string.h>
 #include <stdbool.h>
 /*
-  	del function 추가
-	예제 3 구현
+   getNode 변경에 대한 주석
+   형변환으로 인해 신경 써야하는 부분 주석
+   피연산자와 연산자 간의 간격에 대한 논의(조교님한테 여쭤봐야함)
+   형변환하는 부분
+   형변환으로 인해 바뀐것에 대한 예시
+   '-'일 경우와 '+'일 경우
+   첫 시작이 '+'일 경]
 	*/
 
 typedef char element;
@@ -17,7 +22,9 @@ typedef struct node_info{
 	element data; 
 	struct node_info* next_pointer;
 	struct node_info* prev_pointer;
-}node_info;
+} node_info;
+
+//Stack 구현
 
 typedef struct Node {
     int data;
@@ -70,19 +77,20 @@ int Peek(Stack *stack) {
 
 bool flag = 0;
 
-void insert_node(pointer *target,int data){
+void insert_node(pointer *target,int data) {
 	node_info *new_node = malloc(sizeof(node_info));
 	new_node -> next_pointer = NULL;
 	new_node -> prev_pointer = NULL;
 	new_node -> data = data;
-	if(target->head == NULL)
+	if (target->head == NULL)
 		target->head = target->tail = new_node;
-	else{
+	else {
 		target->tail-> next_pointer = new_node;
 		new_node->prev_pointer = target->tail;
 		target->tail = new_node; 
 	}
 }
+
 node_info* getNode(node_info *target,char index_char){
 	/*
 	   getNode를 하는 경우는 숫자가 아닌 문자를 찾는다.
@@ -95,8 +103,8 @@ node_info* getNode(node_info *target,char index_char){
 	}
 	return target;
 }
-void Display(node_info *node){
-	printf("\n=====Display Node=====\n");
+
+void Display(node_info *node) {
 	while(node != NULL){
 		if(node->data >= 0 && node->data <= 9)
 			printf("%d",node->data); 
@@ -108,10 +116,9 @@ void Display(node_info *node){
 		   */
 		node=node->next_pointer;
 	}
-	printf("\n=====Display terminated=====\n");
 }
 
-void setNode(node_info *target){
+void setNode(node_info *target) {
 	if(target->data >= 0 && target->data <= 9){
 		node_info *new_node = malloc(sizeof(node_info));
 		new_node -> data = 'P';
@@ -120,7 +127,7 @@ void setNode(node_info *target){
 		target -> prev_pointer = new_node;
 		target = target->next_pointer;
 		flag =1;
-	}else if(target->data == '-'){
+	} else if(target->data == '-'){
 		target->data = 'N';
 		target->next_pointer = target->next_pointer->next_pointer;
 		target = target->next_pointer;
@@ -129,13 +136,14 @@ void setNode(node_info *target){
 	/*
 	   처음 시작했을 경우에 +인 경우를 위한 처리
 	   */
-	while(target !=NULL){
-		if(target->data == '+'){
+	while(target !=NULL) {
+		if(target->data == '+') {
 			if(target->next_pointer->next_pointer->data >=0 && target->next_pointer->next_pointer->data <=9){
 				target = target->next_pointer;
 				node_info *new_node = malloc(sizeof(node_info));
 				/*
 				   연산자 및 피연산자 사이는 무조건 스페이스바로 되어있나?
+                   -> 네 피연산자를 제외한 모든 부분은 스페이스바로 구별되어 있습니다. + 괄호 '()' 도 연산자로 구별됩니다.
 				   예시2) 123 + 540 - ( 342)	||	123 + 540 - (354)
 				   */
 				new_node -> data = 'P';
@@ -146,7 +154,7 @@ void setNode(node_info *target){
 			}
 		}
 		
-		if(target->data == '-'){
+		if(target->data == '-') {
 			if(target->prev_pointer->prev_pointer->data < 0 || target->prev_pointer->prev_pointer->data > 9){
 				target->data = 'N';
 				target -> next_pointer = target->next_pointer->next_pointer;
@@ -156,7 +164,8 @@ void setNode(node_info *target){
 		target = target->next_pointer;
 	}
 }
-node_info *setCurr(pointer *target){
+
+node_info *setCurr(pointer *target) {
 	node_info *curr = malloc(sizeof(node_info));
 	if(flag == 1)
 		curr = target->head->prev_pointer;
@@ -164,11 +173,8 @@ node_info *setCurr(pointer *target){
 		curr = target->head;
 	return curr;
 }
-void delNode(node_info *target){
-	target->prev_pointer->next_pointer = target->next_pointer;
-	target->next_pointer->prev_pointer = target->prev_pointer;
-}
 
+//연산자의 우선순위 반환 함수 prec
 int prec(char op) {
 	switch(op) {
 		case'(':case')': return 0;
@@ -186,7 +192,7 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 	Stack s;
 	init_stack(&s);
 
-	while(curr != NULL) {
+	while(curr->next_pointer == NULL) {
 
 		switch(curr->data) {
 			case'+':case'-':case'*':
@@ -216,25 +222,28 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 	}
 }
 
-int main(int argc,char* argv[]){
+int main(int argc,char* argv[]) {
 	char data;
 	FILE *fp=fopen(argv[1],"r");
+
 	pointer *L = (pointer *)malloc(sizeof(pointer));
 	L->head = NULL;
 	L->tail = NULL;
+
+	//postfix 처리를 끝낸 식을 저장하는 L3
 
 	pointer *L3 = (pointer *)malloc(sizeof(pointer));
 	L3->head = NULL;
 	L3->tail = NULL;
 	
-	while(fscanf(fp,"%c",&data)!=EOF){
-		if(data >= '0' && data <= '9'){
+	while(fscanf(fp,"%c",&data)!=EOF) {
+		if(data >= '0' && data <= '9') {
 			/*
 			   숫자 - int로의 형변환
 			   */
 			insert_node(L,atoi(&data));
 		}
-		else if(data == '.'|| data == '+' || data == '-' || data == ' ' || data == ')'|| data == '('){
+		else if(data == '.'|| data == '+' || data == '-' || data == ' ' || data == ')'|| data == '(') {
 			/*
 			   char - 그대로 유지
    				*/
@@ -249,15 +258,18 @@ int main(int argc,char* argv[]){
 	curr =setCurr(L);
 	Display(curr);
 	curr = setCurr(L);
-	node_info *test= getNode(curr,'.');
+	node_info *test= getNode(curr,' ');
+	test = getNode(curr,' ');
 	printf("\n");
-	
+
+	//postfix 완료된 List -> L3
+
 	node_info *curr_3 = L3->head;
 	curr_3 = setCurr(L3);
 	infix_to_postfix(L3, curr, curr_3);
 	curr_3 = setCurr(L3);
 	Display(curr_3);
-
+	
 	//예제 1
 	/*
 	curr =setCurr(L);
@@ -268,7 +280,7 @@ int main(int argc,char* argv[]){
 		if(curr->data>=0 && curr->data <= 9) 
 			printf("%d",curr->data);
 		else
-			printf("%c",curr->data);
+			printf("%c",:curr->data);
 		curr = curr ->next_pointer;
 	}
 	*/
@@ -279,30 +291,23 @@ int main(int argc,char* argv[]){
 		test = test-> next_pointer;
 	}
 	*/
-	//예제 3
-	curr = setCurr(L);
-	Display(curr);
-	delNode(test);
-	curr = setCurr(L);
-	Display(curr);
-
 	curr = setCurr(L);
 	while(curr != NULL){
 		node_info *next = curr->next_pointer;
 		free(curr);
 		curr = next;
-	}
-	
+	}//초기화하는 부분
+
 	curr_3 = setCurr(L3);
 	while(curr_3 != NULL) {
 		node_info *next_3 = curr_3->next_pointer;
 		free(curr_3);
 		curr_3 = next_3;
 	}
-	//초기화하는 부분
-	free(L);
-	free(L3);
 
+	free(L);
+
+	free(L3);
 	
 	return 0;
 
