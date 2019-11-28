@@ -184,7 +184,7 @@ int prec(char op) {
 	return -1;
 }
 
-void infix_to_postfix(node_info *curr, node_info *curr_3) {
+void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 
 	int i = 0;
 	char top_op;
@@ -192,25 +192,33 @@ void infix_to_postfix(node_info *curr, node_info *curr_3) {
 	Stack s;
 	init_stack(&s);
 
-	switch(curr->data) {
-		case'+':case'-':case'*':
-			Push(&s, curr->data);
-			break;
-		case'(':
-			Push(&s, curr->data);
-			break;
-		case')': //왼쪽 괄호를 만날 때 까지 출력.
-			top_op = Pop(&s);
-			while(top_op != '(') {
+	while(curr->next_pointer == NULL) {
+
+		switch(curr->data) {
+			case'+':case'-':case'*':
+				while(!is_empty(&s) && (prec(curr->data) <= prec(Peek(&s)))) {
+					curr_3->data = Pop(&s);
+				}
+				Push(&s, curr->data);
+				break;
+			case'(':
+				Push(&s, curr->data);
+				break;
+			case')': //왼쪽 괄호를 만날 때 까지 출력.
 				top_op = Pop(&s);
-			}
-			break;
-		default: // 피연산자를 만나면 출력
-			curr_3->data = Pop(&s);
-			break;
-	}
-	while (!is_empty(&s)) {
-		curr_3->data = Pop(&s); //마지막에 스택에 있는 연산자들 출력.
+				while(top_op != '(') {
+					top_op = Pop(&s);
+				}
+				break;
+			default: // 피연산자를 만나면 출력
+				insert_node(L3, Pop(&s));
+				break;
+		}
+		while (!is_empty(&s)) {
+			insert_node(L3, Pop(&s)); //마지막에 스택에 있는 연산자들 출력.
+		}
+		curr = curr->next_pointer;
+		curr_3 = curr_3->next_pointer;
 	}
 }
 
@@ -257,10 +265,9 @@ int main(int argc,char* argv[]) {
 	//postfix 완료된 List -> L3
 
 	node_info *curr_3 = L3->head;
-	setNode(curr_3);
 	curr_3 = setCurr(L3);
 
-	infix_to_postfix(curr, curr_3);
+	infix_to_postfix(L3, curr, curr_3);
 
 	Display(curr_3);
 	
@@ -274,7 +281,7 @@ int main(int argc,char* argv[]) {
 		if(curr->data>=0 && curr->data <= 9) 
 			printf("%d",curr->data);
 		else
-			printf("%c",curr->data);
+			printf("%c",:curr->data);
 		curr = curr ->next_pointer;
 	}
 	*/
@@ -291,6 +298,13 @@ int main(int argc,char* argv[]) {
 		free(curr);
 		curr = next;
 	}//초기화하는 부분
+
+	curr_3 = setCurr(L3);
+	while(curr_3 != NULL) {
+		node_info *next_3 = curr_3->next_pointer;
+		free(curr_3);
+		curr_3 = next_3;
+	}
 
 	free(L);
 
