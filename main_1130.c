@@ -17,7 +17,7 @@ typedef struct node_info{
 
 bool flag = 0;
 
-//Stack 구현
+//Stack 구현 시작
 
 typedef struct Node {
     int data;
@@ -27,7 +27,6 @@ typedef struct Node {
 typedef struct Stack {
     Node *top;
 } Stack;
-
 
 void init_stack(Stack *stack) {
     stack->top = NULL;
@@ -68,6 +67,7 @@ int Peek(Stack *stack) {
     return stack->top->data;
 }
 
+//Stack 구현 완료
 
 void insert_node(pointer *target,int data){
 	node_info *new_node = malloc(sizeof(node_info));
@@ -275,6 +275,7 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 		while (!is_empty(&s)) {
 			insert_node(L3, Pop(&s)); //마지막에 스택에 있는 연산자들 insert.
 		}
+        Display(L3);
 		curr = curr->next_pointer;
 	}
 }
