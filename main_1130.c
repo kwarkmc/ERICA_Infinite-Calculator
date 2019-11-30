@@ -246,12 +246,12 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 	char top_op;
 	Stack s;
 	init_stack(&s);
-	while(curr->next_pointer != NULL) {
+	while(curr != NULL) {
         printf("switch loop\n");
 		switch(curr->data) {
 			case'+':case'-':case'*':
 				while(!is_empty(&s) && (prec(curr->data) <= prec(Peek(&s)))) {
-					curr_3->data = Pop(&s);
+					insert_node(L3, Pop(&s));
 				}
                 printf("+-*\n");
 				Push(&s, curr->data);
@@ -264,7 +264,7 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
                 printf(")\n");
 				top_op = Pop(&s);
 				while(top_op != '(') {
-					top_op = Pop(&s);
+					insert_node(L3, Pop(&s));
 				}
 				break;
 			default: // 피연산자를 만나면 node insert
@@ -276,7 +276,6 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 			insert_node(L3, Pop(&s)); //마지막에 스택에 있는 연산자들 insert.
 		}
 		curr = curr->next_pointer;
-		curr_3 = curr_3->next_pointer;
 	}
 }
 
