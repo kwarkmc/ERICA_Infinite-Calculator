@@ -250,7 +250,6 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
         printf("switch loop\n");
 		switch(curr->data) {
 			case'+':case'-':case'*':
-			/*
 				while(!is_empty(&s)) {
 					printf("%d, %d\n", prec(curr->data), prec(Peek(&s)));
 					if (prec(curr->data) >= prec(Peek(&s))) {
@@ -258,7 +257,6 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 						insert_node(L3, Pop(&s));
 					}
 				}
-			*/
                 printf("+-*\n");
 				Push(&s, curr->data);
 				break;
