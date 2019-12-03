@@ -231,43 +231,47 @@ void delNode(node_info *target){
 }//target을 지우는 함수 
 
 //연산자의 우선순위 반환 함수 prec
-int prec(char op) {
+int prec(int op) {
+	printf("%d\n", op);
 	switch(op) {
-		case'(':case')': return 0;
-		case'+':case'-': return 1;
-		case'*': return 2;
+		case 40:case 41:
+			printf("prec (,)\n");
+			return 0;
+		case 43:case 45:
+			printf("prec +,-\n");
+			return 1;
+		case 42:
+			printf("prec *\n");
+			return 2;
 	}
+	printf("prec nop\n");
 	return -1;
 }
 
 void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 
 	int i = 0;
-	char top_op;
+	int top_op;
 	Stack s;
 	init_stack(&s);
 	while(curr != NULL) {
-        printf("switch loop\n");
 		switch(curr->data) {
-			case'+':case'-':case'*':
-				while(!is_empty(&s)) {
+			case 43:case 45:case 42:
+				while((!is_empty(&s)) && (prec(curr->data) < prec(Peek(&s)))) {
 					printf("%d, %d\n", prec(curr->data), prec(Peek(&s)));
-					if (prec(curr->data) >= prec(Peek(&s))) {
-						printf("%d\n",Peek(&s));
-						insert_node(L3, Pop(&s));
-					}
+					insert_node(L3, Pop(&s));
 				}
                 printf("+-*\n");
 				Push(&s, curr->data);
 				break;
-			case'(':
+			case 40:
                 printf("(\n");
 				Push(&s, curr->data);
 				break;
-			case')': //왼쪽 괄호를 만날 때 까지 출력.
+			case 41: //왼쪽 괄호를 만날 때 까지 출력.
                 printf(")\n");
 				top_op = Pop(&s);
-				while(top_op != '(') {
+				while(top_op != 40) {
 					insert_node(L3, Pop(&s));
 				}
 				break;
@@ -276,9 +280,12 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 				insert_node(L3, curr->data);
 				break;
 		}
-		while (!is_empty(&s)) {
+		if(!is_empty(&s)) {
+			while (is_empty(&s)) {
 			insert_node(L3, Pop(&s)); //마지막에 스택에 있는 연산자들 insert.
+			}
 		}
+		
         Display(L3);
 		curr = curr->next_pointer;
 	}
