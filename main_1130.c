@@ -48,7 +48,7 @@ int Pop(Stack *stack) {
     int re;
 
     if(is_empty(stack)) {
-        fprintf(stderr, "Stack Empty\n");
+        fprintf(stderr, "Stack Empty_Pop\n");
         exit(1);
     }
 
@@ -61,7 +61,7 @@ int Pop(Stack *stack) {
 
 int Peek(Stack *stack) {
     if(is_empty(stack)) {
-        fprintf(stderr, "Stack Full\n");
+        fprintf(stderr, "Stack Empty_Peek\n");
         exit(1);
     }
     return stack->top->data;
@@ -250,9 +250,15 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
         printf("switch loop\n");
 		switch(curr->data) {
 			case'+':case'-':case'*':
-				while(!is_empty(&s) && (prec(curr->data) <= prec(Peek(&s)))) {
-					insert_node(L3, Pop(&s));
+			/*
+				while(!is_empty(&s)) {
+					printf("%d, %d\n", prec(curr->data), prec(Peek(&s)));
+					if (prec(curr->data) >= prec(Peek(&s))) {
+						printf("%d\n",Peek(&s));
+						insert_node(L3, Pop(&s));
+					}
 				}
+			*/
                 printf("+-*\n");
 				Push(&s, curr->data);
 				break;
