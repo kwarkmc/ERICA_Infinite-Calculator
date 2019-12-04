@@ -393,22 +393,21 @@ int main(int argc,char* argv[]){
 	insert_prev_node(target,'P');
 	insert_next_node(target,'N');
 	*/
-	Display(L);
 	curr = setCurr(L);
 	while(curr != NULL){
 		node_info *next = curr->next_pointer;
 		free(curr);
 		curr = next;
 	}//초기화하는 부분
-	/*
+	
     curr_3 = setCurr(L3);
     while(curr_3 != NULL) {
         node_info *next_3 = curr_3->next_pointer;
         free(curr_3);
         curr_3 = next_3;
-    }*/	
+    }
 	free(L);
-	//free(L3);
+	free(L3);
 	return 0;
 
 	/*
