@@ -309,7 +309,6 @@ int main(int argc,char* argv[]){
 	fclose(fp);
 	node_info *curr;
 	curr = setCurr(L);
-	delNode(curr);
 	setSpace(L);
 	setNode(L);
 	//예제 1
