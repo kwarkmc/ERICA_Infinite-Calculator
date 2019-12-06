@@ -43,7 +43,7 @@ void insert_node(pointer *target,int data){
 		new_node->prev_pointer = target->tail;
 		target->tail = new_node; 
 	}
-}//target의 tail에 inster 하는 것
+}//target의 tail에 insert 하는 것
 
 void insert_next_node(node_info *target,int data){
     node_info *new_node = malloc(sizeof(node_info));
@@ -224,6 +224,7 @@ int Pop(Stack *stack) {
     free(now);
     return re;
 }
+
 int prec(char op) {
     switch(op) {
         case'(':case')': return 10;
