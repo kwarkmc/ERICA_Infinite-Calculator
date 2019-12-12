@@ -150,18 +150,18 @@ void delNode(node_info *target) {
 
 void init_stack(Stack *stack) {
     stack->top = NULL;
-}
+} // Linked-List로 구현된 Stack을 사용할 수 있도록 initialize 하는 함수
 
 int is_empty(Stack *stack) {
     return (stack->top == NULL);
-}
+} // Stack 내에 Data 가 있는지 확인하는 함수 | Stack이 비어있으면 1을 return한다.
 
 void Push(Stack *stack, int data) {
     Node *now = (Node *) malloc(sizeof(Node));
     now->data = data;
     now->next = stack->top;
     stack->top = now;
-}
+} // Stack으로 Data 를 Push 하는 함수 | Stack은 Last in - First out, "LIFO"를 따른다.
 
 int Pop(Stack *stack) {
     Node *now;
@@ -177,7 +177,7 @@ int Pop(Stack *stack) {
     stack->top = now->next;
     free(now);
     return re;
-}
+} //Stack 맨 위에 있는 Data (Top) 을 return 하고, 제거하는 함수
 
 int Peek(Stack *stack) {
     if (is_empty(stack)) {
@@ -185,7 +185,7 @@ int Peek(Stack *stack) {
         exit(1);
     }
     return stack->top->data;
-}
+} //Stack 맨 위에 있는 Data (Top) 을 return 하는 함수. | Pop 과는 다르게 Top 을 제거하지 않는다.
 
 int prec(char op){
 	switch(op){
@@ -194,7 +194,7 @@ int prec(char op){
 		case'*': return 3;
 	}
 	return -1;
-}
+} // +, -, * 연산자의 우선순위를 return 하는 함수 | +, - 는 return 2, * 는 return 3 한다.
 
 void setNode(pointer *target){
     node_info *curr = target->head;
@@ -907,20 +907,22 @@ void I_Calculator(pointer *L) {
 
 void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 
-    int i = 0;
     char top_op;
+
     Stack s;
+
     init_stack(&s);
+
     while(curr != NULL) {
 		if(curr->data != '+'&&curr->data != '-'&&curr->data != '*'&&curr->data != '('&&curr->data     != ')'){
 			insert_node(L3,curr->data);
-		}
+		} // +, -, *, (, ) 도 아닌 피연산자일 경우 L3 List 에 무조건 insert_node 한다.
 
         switch(curr->data) {
             case'+':case'-':case'*':
                 while(!is_empty(&s)&& prec(curr->data) <= prec(Peek(&s))&&(Peek(&s)!='(')){
                     insert_node(L3, Pop(&s));
-				}
+				} // prec 함수를 이용하여 연산자의 우선순위를 return 한 후, Stack 에 있는 연산자보다 curr 연산자의 우선순위가 높거나 같은것들을 모두 L3 List에 insert_node 한다.
                 Push(&s, curr->data);
                 curr = curr->next_pointer;
                 break;
@@ -928,33 +930,17 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
                 Push(&s, curr->data);
                 curr = curr->next_pointer;
                 break;
-            case')': //왼쪽 괄호를 만날 때 까지 출력.
+            case')':
                 while((top_op=Pop(&s)) != '(') {
                     insert_node(L3, top_op);
                 }
-                break;
+                break; // Stack 안의 '(' 를 만날 때 까지 Stack 안의 연산자들을 Pop 한다.
         }
         curr = curr->next_pointer;
     }
     while (!is_empty(&s)) {
         insert_node(L3, Pop(&s)); //마지막에 스택에 있는 연산자들 insert.
-    }
-}
-
-void ReverseNode(pointer *target){
-	node_info *curr = target->tail;
-	printf("Reverse");
-	while(curr != NULL){
-		if(curr->data >= 0 && curr->data <= 9)
-			printf("%d",curr->data);
-		else if(curr->data == 'P')
-			printf("+");
-		else if(curr->data == 'N')
-			printf("-");
-		else
-			printf("%c",curr->data);
-		curr = curr->prev_pointer;
-	}
+    } // L List 에 있던 모든 Node 를 처리하면, Stack 에 Data 가 남아있지 않도록 모두 Pop 한다.
 }
 
 int main(int argc, char *argv[]) {
