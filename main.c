@@ -425,6 +425,9 @@ void Add(pointer *L1, pointer *L2, int *fd1, int *bd1, int *fd2, int *bd2) {//�
 
 void Convert_Zero(pointer *L1) { // 앞뒤 0제거
     setHead(L1);
+    if(L1->head->data == 0 && L1->head->next_pointer == NULL){
+        return;
+    }
     int have_dot = 0;
     while (L1->head->data == 0) { // 앞에서부터 0제거
         if (L1->head->next_pointer->data == '.') {
@@ -470,7 +473,13 @@ void Convert_Number(pointer *L1,int *Its_P, int *Its_N) { //시작값이 양수�
             *Its_N = 1;
             break;
         } else { //0인경우
-            L1->head = L1->head->next_pointer;
+            if(L1->head->data == 0 && L1->head->next_pointer == NULL){
+                *Its_P = 1;
+                break;
+            }
+            else {
+                L1->head = L1->head->next_pointer;
+            }
         }
     }
 
@@ -589,24 +598,39 @@ void Multiply(pointer *L1, pointer *L2, pointer *L5, int *node_num, int *decimal
     for (int i = 0; i < *node_num; i++) {
         insert_node(L5, 0);
     }
-
-    setTail(L5);//포인터 tail로 초기화(L1,L2,L5)
-
+    setTail(L5); //포인터 tail로 초기화(L1,L2,L5)
     int k = 0;
-    while (L2->tail != NULL) {
-        while (L1->tail != NULL) {
-            if(L1->tail->prev_pointer == NULL){
-                L5->tail->data += ((L1->tail->data) * (L2->tail->data));
+    while(L1->head != NULL){
+        if(L1->head->next_pointer == NULL){
+            break;
+        }
+        L1->head = L1->head->next_pointer;
+    }
+    while(L2->head != NULL){
+        if(L2->head->next_pointer == NULL){
+            break;
+        }
+        L2->head = L2->head->next_pointer;
+    }
+    while (L2->head != NULL) {
+        while (L1->head != NULL) {
+            if(L1->head->prev_pointer == NULL){
+                L5->tail->data += ((L1->head->data) * (L2->head->data));
                 break;
             }
-            L5->tail->data += ((L1->tail->data) * (L2->tail->data));
+            L5->tail->data += ((L1->head->data) * (L2->head->data));
             L5->tail = L5->tail->prev_pointer;
-            L1->tail = L1->tail->prev_pointer;
+            L1->head = L1->head->prev_pointer;
         }
         k++;
         //여기서 multiply convert_num처리 필요
-        setTail(L1);
-        L2->tail = L2->tail->prev_pointer;
+        while(L1->head != NULL){
+            if(L1->head->next_pointer == NULL){
+                break;
+            }
+            L1->head = L1->head->next_pointer;
+        }
+        L2->head = L2->head->prev_pointer;
         setTail(L5);
         for (int i = 0; i < k; i++) {
             L5->tail = L5->tail->prev_pointer;
@@ -628,12 +652,13 @@ void Multiply(pointer *L1, pointer *L2, pointer *L5, int *node_num, int *decimal
             break;
         }
     }
-
     setTail(L5);
     for (int i = 0; i < *decimal_place; i++) {
         L5->tail = L5->tail->prev_pointer;
     }
-    insert_next_node(L5->tail, '.');
+    if(*decimal_place > 0) {
+        insert_next_node(L5->tail, '.');
+    }
 }
 
 void I_Calculator(pointer *L) {
@@ -642,7 +667,6 @@ void I_Calculator(pointer *L) {
     int m_n = 0;
     Stack Num;
     init_stack(&Num);
-	pointer *result = (pointer *)malloc(sizeof(pointer));
     while (L->head != NULL) {
         if(L->head->next_pointer == NULL){
             break;
@@ -686,16 +710,15 @@ void I_Calculator(pointer *L) {
                     if(L1->head->data == '.'){
                         L1->head = L1->head->next_pointer;
                     }
-                    else{
+                    if(L1->head->next_pointer == NULL){
+                        L1->head->data *= (-1);
+                        break;
+                    }
+                    if(L1->head->data != '.'){
                         L1->head->data *= (-1);
                         L1->head = L1->head->next_pointer;
                     }
-                    if(L1->head->next_pointer == NULL){
-                        if(L1->head->data != 0){
-                            L1->head->data *= (-1);
-                        }
-                        break;
-                    }
+
                 }
                 setHead(L1);
             }
@@ -756,6 +779,7 @@ void I_Calculator(pointer *L) {
             setHead(L1);
             int Its_P = 0, Its_N = 0;
             Convert_Number(L1,&Its_P,&Its_N);
+
             Convert_Zero(L1);
             setHead(L1);
 
@@ -775,7 +799,6 @@ void I_Calculator(pointer *L) {
                     L1->head = L1->head->next_pointer;
                 }
             }
-            setHead(L1);
             free(L1);
             free(L2);
             L->head = L->head->next_pointer;
@@ -823,6 +846,7 @@ void I_Calculator(pointer *L) {
                 m_n +=1 ;
                 delNode(L2->head);
             }
+
             int node_num = 0, decimal_place = 0; // 전체노드개수와 점노드수 초기화
             Preprocess_Multiply(L1,L2,&node_num,&decimal_place);
             setHead(L1);
@@ -847,11 +871,11 @@ void I_Calculator(pointer *L) {
                     L5->head = L5->head->next_pointer;
                 }
             }
-            setHead(L5);
             free(L1);
             free(L2);
             free(L5);
             L->head = L->head->next_pointer;
+
         }
 
         else {
@@ -860,17 +884,25 @@ void I_Calculator(pointer *L) {
         }
 
     }
-    printf("\n");
+    Stack result;
+    init_stack(&result);
     while (is_empty(&Num) != 1) {
-        int K = Pop(&Num);
-		if(K >= 0 && K <= 9)
+        Push(&result, Pop(&Num));
+    }
+    while (is_empty(&result) != 1){
+        int K = Pop(&result);
+        if(K >= 0 && K <= 9)
             printf("%d", K);
+        else if(K == 'P'){
+
+        }
+        else if(K == 'N'){
+            printf("-");
+        }
         else{
             printf("%c", K);
         }
     }
-    printf("\n");
-    printf("\n");
 }
 
 void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
