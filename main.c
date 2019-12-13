@@ -188,12 +188,12 @@ int Peek(Stack *stack) {
 } //Stack 맨 위에 있는 Data (Top) 을 return 하는 함수. | Pop 과는 다르게 Top 을 제거하지 않는다.
 
 int prec(char op){
-	switch(op){
-		case'(': return 1;
-		case'+':case'-': return 2;
-		case'*': return 3;
-	}
-	return -1;
+    switch(op){
+        case'(': return 1;
+        case'+':case'-': return 2;
+        case'*': return 3;
+    }
+    return -1;
 } // +, -, * 연산자의 우선순위를 return 하는 함수 | +, - 는 return 2, * 는 return 3 한다.
 
 void setNode(pointer *target){
@@ -618,12 +618,20 @@ void Multiply(pointer *L1, pointer *L2, pointer *L5, int *node_num, int *decimal
                 L5->tail->data += ((L1->head->data) * (L2->head->data));
                 break;
             }
-            L5->tail->data += ((L1->head->data) * (L2->head->data));
+            int U = L5->tail->data + L1->head->data * L2->head->data;
+            if(U > 100){
+                L5->tail->prev_pointer->data += 10;
+                L5->tail->data += L1->head->data * L2->head->data;
+                L5->tail->data -= 100;
+            }
+            if(U <= 100) {
+                L5->tail->data += ((L1->head->data) * (L2->head->data));
+            }
             L5->tail = L5->tail->prev_pointer;
             L1->head = L1->head->prev_pointer;
         }
         k++;
-        //여기서 multiply convert_num처리 필요
+
         while(L1->head != NULL){
             if(L1->head->next_pointer == NULL){
                 break;
@@ -805,6 +813,8 @@ void I_Calculator(pointer *L) {
         }
 
         else if (L->head->data == '*'){ // 곱셈
+            int m_p = 0;
+            int m_n = 0;
             Pop(&Num);
             pointer *L2 = (pointer *) malloc(sizeof(pointer));
             L2->head = NULL;
@@ -914,15 +924,15 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
     init_stack(&s);
 
     while(curr != NULL) {
-		if(curr->data != '+'&&curr->data != '-'&&curr->data != '*'&&curr->data != '('&&curr->data     != ')'){
-			insert_node(L3,curr->data);
-		} // +, -, *, (, ) 도 아닌 피연산자일 경우 L3 List 에 무조건 insert_node 한다.
+        if(curr->data != '+'&&curr->data != '-'&&curr->data != '*'&&curr->data != '('&&curr->data     != ')'){
+            insert_node(L3,curr->data);
+        } // +, -, *, (, ) 도 아닌 피연산자일 경우 L3 List 에 무조건 insert_node 한다.
 
         switch(curr->data) {
             case'+':case'-':case'*':
                 while(!is_empty(&s)&& prec(curr->data) <= prec(Peek(&s))&&(Peek(&s)!='(')){
                     insert_node(L3, Pop(&s));
-				} // prec 함수를 이용하여 연산자의 우선순위를 return 한 후, Stack 에 있는 연산자보다 curr 연산자의 우선순위가 높거나 같은것들을 모두 L3 List에 insert_node 한다.
+                } // prec 함수를 이용하여 연산자의 우선순위를 return 한 후, Stack 에 있는 연산자보다 curr 연산자의 우선순위가 높거나 같은것들을 모두 L3 List에 insert_node 한다.
                 Push(&s, curr->data);
                 curr = curr->next_pointer;
                 break;
@@ -945,7 +955,7 @@ void infix_to_postfix(pointer *L3, node_info *curr, node_info *curr_3) {
 
 int main(int argc, char *argv[]) {
     char data;
-	FILE *fp = fopen(argv[1],"r");
+    FILE *fp = fopen(argv[1],"r");
 
     pointer *L = (pointer *) malloc(sizeof(pointer));
     L->head = NULL;
@@ -978,18 +988,18 @@ int main(int argc, char *argv[]) {
     curr = setCurr(L);
     setSpace(L);
     setNode(L);
-	Display(L);
-	node_info *curr_3;
+    Display(L);
+    node_info *curr_3;
     curr_3 = setCurr(L3);
     curr = setCurr(L);
     infix_to_postfix(L3, curr, curr_3);
     setSpace(L3);
-	insert_next_node(L3->tail,' ');
+    insert_next_node(L3->tail,' ');
     Display(L3);
-	
-	I_Calculator(L3);
-	
-	curr = setCurr(L);
+
+    I_Calculator(L3);
+
+    curr = setCurr(L);
     while(curr != NULL){
         node_info *next = curr->next_pointer;
         free(curr);
